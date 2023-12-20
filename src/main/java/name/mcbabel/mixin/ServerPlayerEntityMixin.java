@@ -1,10 +1,13 @@
 package name.mcbabel.mixin;
 
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.network.message.SentMessage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import com.llamalad7.mixinextras.sugar.Local;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin {
@@ -15,5 +18,12 @@ public class ServerPlayerEntityMixin {
         // This code is injected into the start of
         // ServerPlayerEntity.sendChatMessage(Lnet/minecraft/network/message/SentMessage;)V
         System.out.println("A player sent a chat message!");
+    }
+
+    @Inject(at = @At("TAIL"), method = "sendChatMessage")
+    private void injected(CallbackInfo ci, @Local(ordinal = 0) SentMessage message) {
+        // This code is injected into the end of
+        // ServerPlayerEntity.sendChatMessage(Lnet/minecraft/network/message/SentMessage;)V
+        System.out.println("The message was: " + message.getContent().getString());
     }
 }
