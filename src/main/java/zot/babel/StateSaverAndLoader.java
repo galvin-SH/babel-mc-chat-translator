@@ -6,6 +6,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
+
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -17,9 +18,7 @@ public class StateSaverAndLoader extends PersistentState {
     @Override
     // save data to the hashmap
     public NbtCompound writeNbt(NbtCompound nbt) {
-
         NbtCompound playersNbt = new NbtCompound();
-
         players.forEach((uuid, playerData) -> {
             NbtCompound playerNbt = new NbtCompound();
             playerNbt.putString("name", playerData.playerName);
@@ -27,6 +26,7 @@ public class StateSaverAndLoader extends PersistentState {
             playersNbt.put(uuid.toString(), playerNbt);
         });
         nbt.put("players", playersNbt);
+        Babel.LOGGER.info("Saved state to NBT");
         return nbt;
     }
 
@@ -36,21 +36,25 @@ public class StateSaverAndLoader extends PersistentState {
         NbtCompound playersNbt = tag.getCompound("players");
         playersNbt.getKeys().forEach(key -> {
             PlayerData playerData = new PlayerData();
-
             playerData.playerName = playersNbt.getCompound(key).getString("name");
             playerData.playerLocale = playersNbt.getCompound(key).getString("locale");
             UUID uuid = UUID.fromString(key);
             state.players.put(uuid, playerData);
         });
+        Babel.LOGGER.info("Loaded state from NBT");
         return state;
     }
 
     // get the persistent state manager for the server
     public static StateSaverAndLoader getServerState(MinecraftServer server) {
-        PersistentStateManager manager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
-        StateSaverAndLoader state = manager.getOrCreate(StateSaverAndLoader::createFromNbt, StateSaverAndLoader::new,
-                Babel.MOD_ID);
-        state.markDirty();
+        PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
+
+        StateSaverAndLoader state = persistentStateManager.getOrCreate(
+                StateSaverAndLoader::createFromNbt, // readFunction 
+                StateSaverAndLoader::new, // supplier
+                Babel.MOD_ID); // data id
+        state.markDirty(); // mark the state as dirty so it is forced to save before Minecraft shuts down
+        Babel.LOGGER.info("Loaded server state");
         return state;
     }
 
@@ -58,6 +62,7 @@ public class StateSaverAndLoader extends PersistentState {
     public static PlayerData getPlayerState(LivingEntity player) {
         StateSaverAndLoader serverState = getServerState(player.getWorld().getServer());
         PlayerData playerState = serverState.players.computeIfAbsent(player.getUuid(), uuid -> new PlayerData());
+        Babel.LOGGER.info("Loaded player state for " + player.getName().getString());
         return playerState;
     }
 }

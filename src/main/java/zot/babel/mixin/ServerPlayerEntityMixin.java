@@ -1,5 +1,6 @@
 package zot.babel.mixin;
 
+import zot.babel.Babel;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.network.message.SentMessage;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,13 +18,13 @@ public class ServerPlayerEntityMixin {
     private void onSendChatMessage(CallbackInfo info) {
         // This code is injected into the start of
         // ServerPlayerEntity.sendChatMessage(Lnet/minecraft/network/message/SentMessage;)V
-        System.out.println("A player sent a chat message!");
+        Babel.LOGGER.info("A player sent a chat message!");
     }
 
     @Inject(at = @At("TAIL"), method = "sendChatMessage")
     private void injected(CallbackInfo ci, @Local(ordinal = 0) SentMessage message) {
         // This code is injected into the end of
         // ServerPlayerEntity.sendChatMessage(Lnet/minecraft/network/message/SentMessage;)V
-        System.out.println("The message was: " + message.getContent().getString());
+        Babel.LOGGER.info("The message was: " + message.getContent().getString());
     }
 }
