@@ -1,4 +1,4 @@
-package name.mcbabel.mixin;
+package zot.babel.mixin;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.network.message.SentMessage;

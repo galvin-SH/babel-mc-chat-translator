@@ -1,10 +1,12 @@
-package name.mcbabel;
+package zot.babel;
 
 import net.fabricmc.api.ClientModInitializer;
 
 public class BabelClient implements ClientModInitializer {
+
+	public static PlayerData playerData = new PlayerData();
+
 	@Override
 	public void onInitializeClient() {
-		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
 	}
 }
