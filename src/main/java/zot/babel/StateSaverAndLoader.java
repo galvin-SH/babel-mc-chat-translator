@@ -24,6 +24,7 @@ public class StateSaverAndLoader extends PersistentState {
             playerNbt.putString("name", playerData.playerName);
             playerNbt.putString("locale", playerData.playerLocale);
             playersNbt.put(uuid.toString(), playerNbt);
+            Babel.LOGGER.info("Saving data for player " + playerData.playerName + " under UUID " + uuid.toString());
         });
         nbt.put("players", playersNbt);
         Babel.LOGGER.info("Saved state to NBT");
@@ -40,6 +41,7 @@ public class StateSaverAndLoader extends PersistentState {
             playerData.playerLocale = playersNbt.getCompound(key).getString("locale");
             UUID uuid = UUID.fromString(key);
             state.players.put(uuid, playerData);
+            Babel.LOGGER.info("Loading data for player " + playerData.playerName + " under UUID " + uuid.toString());
         });
         Babel.LOGGER.info("Loaded state from NBT");
         return state;
@@ -63,6 +65,7 @@ public class StateSaverAndLoader extends PersistentState {
         StateSaverAndLoader serverState = getServerState(player.getWorld().getServer());
         PlayerData playerState = serverState.players.computeIfAbsent(player.getUuid(), uuid -> new PlayerData());
         Babel.LOGGER.info("Loaded player state for " + player.getName().getString());
+        Babel.LOGGER.info("Player " + playerState.playerName + " locale is currently " + playerState.playerLocale);
         return playerState;
     }
 }
